@@ -1,7 +1,7 @@
 {
   "name": "slack_accountant",
   "version": "1.0.0",
-  "description": "",
+  "description": "the treasurer's best friend",
   "main": "index.js",
   "scripts": {
     "start": "npm install && node index.js",
