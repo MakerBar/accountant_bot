@@ -16,4 +16,4 @@ accountant_bot.run();
 http.createServer(function (req, res) {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.send('it is running\n');
-}).listen(process.env.PORT || 5000);
+}).listen(process.env.PORT || process.env.NODE_PORT || 5000, process.env.NODE_IP || 'localhost');
