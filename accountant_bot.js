@@ -17,13 +17,13 @@ AccountantBot.prototype._onStart = function() {
     this.user = this.users.filter(function (user) {
         return user.name == self.settings.name;
     })[0];
-    
+
     this.postMessageToUser('bert', 'I\'m awake!');
 };
 
 AccountantBot.prototype.handlePublicMessage = function(msg) {
     if (msg.text == 'report') {
-        let channel = this._getChannelById(msg.channel);
+        var channel = this._getChannelById(msg.channel);
         console.log('reporting to', channel);
         this.postMessageToChannel(channel.name, "report .. report ... report...");
     }
@@ -31,7 +31,7 @@ AccountantBot.prototype.handlePublicMessage = function(msg) {
 
 AccountantBot.prototype.handlePrivateMessage = function(msg) {
     if (msg.text == 'report') {
-        let channel = this._getChannelById(msg.channel);
+        var channel = this._getChannelById(msg.channel);
         console.log('reporting to', channel);
         this.postMessageToChannel(channel.name, "report .. report ... report...");
     }
