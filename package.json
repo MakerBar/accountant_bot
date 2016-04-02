@@ -10,6 +10,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "oauth": "^0.9.14",
     "slackbots": "^0.5.1"
   }
 }
