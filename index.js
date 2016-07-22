@@ -22,12 +22,15 @@ accountant_bot.run();
 // silly http server to make heroku happy
 http.createServer(function(req, res) {
     console.log("received http request: ", req.url);
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
     switch (req.url) {
         case "/xero/initauth":
             xeroAuth.genRequestToken(req, res);
             break;
+        case "/xero/authcallback":
+            xeroAuth.verifyToken(req, res);
+            break;
         default:
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end('it is running\n');
     }
 }).listen(process.env.PORT || process.env.NODE_PORT || 5000, process.env.NODE_IP || 'localhost');
