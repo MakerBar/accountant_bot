@@ -3,7 +3,7 @@
 var OAuth = require('oauth');
 
 class XeroAuth {
-    constructor(key, secret) {
+    constructor(key, secret, host) {
         this.oauth = new OAuth.OAuth(
             'https://api.xero.com/oauth/RequestToken',
             'https://api.xero.com/oauth/AccessToken',
@@ -13,23 +13,25 @@ class XeroAuth {
             null,
             'HMAC-SHA1'
         );
+        this.hostname = host;
     }
 
     genRequestToken(req, res) {
-        let xa = this;
-        let get_token = new Promise(function(resolve, reject) {
+        var xa = this;
+        var get_token = new Promise(function(resolve, reject) {
             xa.oauth.getOAuthRequestToken(function(err, oAuthToken, oAuthTokenSecret, results) {
                 if (err) {
                     reject(err);
                 }
                 if (results.error) {
-                    reject(results.error)
+                    reject(results.error);
                 }
                 resolve({oAuthToken, oAuthTokenSecret});
             });
         });
         get_token.then(function(tok) {
-            res.end("https://api.xero.com/oauth/Authorize?oauth_token=" + tok.oAuthToken);
+            var callback = encodeURIComponent('https://' + xa.hostname + "/xero/authcallback");
+            res.end("https://api.xero.com/oauth/Authorize?oauth_token=" + tok.oAuthToken + "&oauth_callback=" + callback);
         }).catch(function(err) {
             console.log(err);
         });

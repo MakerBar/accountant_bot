@@ -8,8 +8,9 @@ var XeroAuth = require("./oauth");
 var slack_token = process.env.BOT_TOKEN;
 var xero_key = process.env.XERO_KEY;
 var xero_secret = process.env.XERO_SECRET;
+var host = process.env.FQDN;
 
-var xeroAuth = new XeroAuth(xero_key, xero_secret);
+var xeroAuth = new XeroAuth(xero_key, xero_secret, host);
 //xeroAuth.get('https://api.xero.com/api.xro/2.0/Users');
 
 var accountant_bot = new AccountantBot({
