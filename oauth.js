@@ -10,7 +10,7 @@ class XeroAuth {
             key,
             secret,
             '1.0A',
-            null,
+            'https://' + host + '/xero/authcallback',
             'HMAC-SHA1'
         );
         this.hostname = host;
@@ -29,9 +29,7 @@ class XeroAuth {
                 resolve({oAuthToken, oAuthTokenSecret});
             });
         });
-        get_token.then(function(tok) {
-            var callback = encodeURIComponent('https://' + xa.hostname + "/xero/authcallback");
-            res.end("https://api.xero.com/oauth/Authorize?oauth_token=" + tok.oAuthToken + "&oauth_callback=" + callback);
+            res.end("https://api.xero.com/oauth/Authorize?oauth_token=" + tok.oAuthToken);
         }).catch(function(err) {
             console.log(err);
         });
