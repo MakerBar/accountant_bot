@@ -12,11 +12,11 @@ var xero_secret = process.env.XERO_SECRET;
 var xeroAuth = new XeroAuth(xero_key, xero_secret);
 //xeroAuth.get('https://api.xero.com/api.xro/2.0/Users');
 
-// var accountant_bot = new AccountantBot({
-//     token: slack_token,
-// });
-//
-// accountant_bot.run();
+var accountant_bot = new AccountantBot({
+    token: slack_token,
+});
+
+accountant_bot.run();
 
 // silly http server to make heroku happy
 http.createServer(function(req, res) {
