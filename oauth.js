@@ -29,6 +29,7 @@ class XeroAuth {
                 resolve({oAuthToken, oAuthTokenSecret});
             });
         });
+        get_token.then(function(tok) {
             res.end("https://api.xero.com/oauth/Authorize?oauth_token=" + tok.oAuthToken);
         }).catch(function(err) {
             console.log(err);
