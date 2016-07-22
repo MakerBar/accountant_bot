@@ -22,7 +22,8 @@ accountant_bot.run();
 // silly http server to make heroku happy
 http.createServer(function(req, res) {
     console.log("received http request: ", req.url);
-    switch (req.url) {
+    var path = req.url.split('?')[0];
+    switch (path) {
         case "/xero/initauth":
             xeroAuth.genRequestToken(req, res);
             break;
