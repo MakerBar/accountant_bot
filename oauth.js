@@ -81,13 +81,18 @@ class XeroAuth {
         });
     }
 
-    get(url, user_token, user_secret) {
-        this.oauth.get(url, user_token, user_secret, function(err, data, res) {
-            console.log(err);
-            console.log("----------------------------------------------------");
-            console.log(data);
-            console.log("----------------------------------------------------");
-            console.log(res);
+    get(path, auth) {
+        return new Promise((resolve, reject) => {
+            this.oauth.get('https://api.xero.com/' + path, auth.oAuthAccessToken, auth.oAuthAccessTokenSecret, function(err, data, res) {
+                if (err) {
+                    reject(err);
+                }
+                if (res.error) {
+                    reject(res.error);
+                }
+                console.log("got", typeof(data), 'back from Xero');
+                resolve(data);
+            });
         });
     }
 }

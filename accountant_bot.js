@@ -3,11 +3,12 @@
 var util = require('util');
 var Bot = require('slackbots');
 
-var AccountantBot = function Constructor(settings) {
+var AccountantBot = function Constructor(settings, xeroAuth) {
     this.settings = settings;
     this.settings.name = this.settings.name || 'accountant_bot';
     this.user = null;
     this.db = null;
+    this.xeroAuth = xeroAuth;
 };
 
 util.inherits(AccountantBot, Bot);
@@ -32,12 +33,16 @@ AccountantBot.prototype.handleMessage = function(msg) {
     if (msg.text == 'balance sheet') {
         console.log('sending balance sheet to', channel, 'for', user.name);
         // authorize user
-        let proms = this.settings.xeroAuth.getAuthToken();
+        let proms = this.xeroAuth.getAuthToken();
         proms.request_promise.then(function(url) {
             ab.postMessageToUser(user.name, 'please go to ' + url + ' to authorize access to Xero');
         });
         proms.access_promise.then(function(access_obj) {
-            ab.postMessage(msg.channel, 'this is where the balance sheet should go. AT: ' + access_obj);
+            return ab.xeroAuth.get('api.xro/2.0/Reports/BalanceSheet', access_obj);
+        }).then(bs => {
+            ab.postMessage(msg.channel, JSON.stringify(bs));
+        }).catch(err => {
+            ab.postMessage(msg.channel, "Sorry, an error occurred: " + err);
         });
     }
 };
