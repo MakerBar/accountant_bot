@@ -21,19 +21,12 @@ AccountantBot.prototype._onStart = function() {
     this.postMessageToUser('bert', 'I\'m awake!');
 };
 
-AccountantBot.prototype.handlePublicMessage = function(msg) {
+AccountantBot.prototype.handleMessage = function(msg) {
     if (msg.text == 'report') {
         var channel = this._getChannelById(msg.channel);
-        console.log('reporting to', channel);
-        this.postMessageToChannel(channel.name, "report .. report ... report...");
-    }
-};
-
-AccountantBot.prototype.handlePrivateMessage = function(msg) {
-    if (msg.text == 'report') {
-        var channel = this._getChannelById(msg.channel);
-        console.log('reporting to', channel);
-        this.postMessageToChannel(channel.name, "report .. report ... report...");
+        var user = this._getUserById(msg.user);
+        console.log('reporting to', channel, 'for', user.name);
+        this.postMessage(msg.channel, "report .. report ... report...");
     }
 };
 
@@ -51,17 +44,21 @@ AccountantBot.prototype._onMessage = function(msg) {
     console.log("-----------");
     if (msg.type == 'message') {
         if (msg.channel[0] == 'C') {
-            this.handlePublicMessage(msg);
+            this.handleMessage(msg);
         } else if (msg.channel[0] == 'D') {
-            this.handlePrivateMessage(msg);
+            this.handleMessage(msg);
         }
     }
 };
 
-AccountantBot.prototype._getChannelById = function (channelId) {
+AccountantBot.prototype._getChannelById = function(channelId) {
     return this.channels.filter(function (item) {
         return item.id === channelId;
     })[0];
+};
+
+AccountantBot.prototype._getUserById = function(uid) {
+    return this.users.find(user => user.id == uid);
 };
 
 AccountantBot.prototype.run = function() {
