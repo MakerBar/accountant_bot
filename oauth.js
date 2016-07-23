@@ -42,11 +42,11 @@ class XeroAuth {
         });
     }
 
-    verifyToken(req, res) {
+    verifyToken(req, res, params) {
         var xa = this;
-        var token = req.query.oauth_token;
-        var verifier = req.query.oauth_verifier;
-        var org = req.query.org;
+        var token = params.oauth_token;
+        var verifier = params.oauth_verifier;
+        var org = params.org;
         var request_token_secret = tokensecrets[token];
         new Promise(function(resolve, reject) {
             xa.oauth.getOAuthAccessToken(token, request_token_secret, verifier,

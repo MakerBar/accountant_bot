@@ -4,6 +4,7 @@ var http = require('http');
 
 var AccountantBot = require('./accountant_bot');
 var XeroAuth = require("./oauth");
+var querystring = require('querystring');
 
 var slack_token = process.env.BOT_TOKEN;
 var xero_key = process.env.XERO_KEY;
@@ -22,13 +23,15 @@ accountant_bot.run();
 // silly http server to make heroku happy
 http.createServer(function(req, res) {
     console.log("received http request: ", req.url);
-    var path = req.url.split('?')[0];
+    var spl = req.url.split('?');
+    var path = spl[0];
+    var params = querystring.parse(spl[1]);
     switch (path) {
         case "/xero/initauth":
             xeroAuth.genRequestToken(req, res);
             break;
         case "/xero/authcallback":
-            xeroAuth.verifyToken(req, res);
+            xeroAuth.verifyToken(req, res, params);
             break;
         default:
             res.writeHead(200, { 'Content-Type': 'text/plain' });
