@@ -42,7 +42,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         }).then(bs => {
             ab.postMessage(msg.channel, JSON.stringify(bs));
         }).catch(err => {
-            ab.postMessage(msg.channel, "Sorry, an error occurred: " + err);
+            ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
         });
     }
 };
