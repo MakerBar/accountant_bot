@@ -18,7 +18,7 @@ class XeroAuth {
         this.hostname = host;
     }
 
-    genRequestUrl() {
+    getAuthToken() {
         var xa = this;
         var access_resolve, access_reject;
         var access_promise = new Promise(function(resolve, reject) {
@@ -37,13 +37,12 @@ class XeroAuth {
                 resolve("https://api.xero.com/oauth/Authorize?oauth_token=" + oAuthToken);
             });
         });
-        return [request_promise, access_promise];
+        return {request_promise, access_promise};
     }
 
     genRequestToken(req, res) {
         var xa = this;
-        let request_promise = this.genRequestUrl()[0];
-        request_promise.then(function(url) {
+        this.getAuthToken().request_promise.then(function(url) {
             res.writeHead(200, { 'Content-Type': 'text/plain' });
             res.end(url);
         }).catch(function(err) {

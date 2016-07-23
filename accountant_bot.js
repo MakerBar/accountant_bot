@@ -22,11 +22,23 @@ AccountantBot.prototype._onStart = function() {
 };
 
 AccountantBot.prototype.handleMessage = function(msg) {
+    let ab = this;
+    var channel = this._getChannelById(msg.channel);
+    var user = this._getUserById(msg.user);
     if (msg.text == 'report') {
-        var channel = this._getChannelById(msg.channel);
-        var user = this._getUserById(msg.user);
         console.log('reporting to', channel, 'for', user.name);
         this.postMessage(msg.channel, "report .. report ... report...");
+    }
+    if (msg.text == 'balance sheet') {
+        console.log('sending balance sheet to', channel, 'for', user.name);
+        // authorize user
+        let proms = this.settings.xeroAuth.getAuthToken();
+        proms.request_promise.then(function(url) {
+            ab.postMessageToUser(user.name, 'please go to ' + url + ' to authorize access to Xero');
+        });
+        proms.access_promise.then(function(access_obj) {
+            ab.postMessage(msg.channel, 'this is where the balance sheet should go. AT: ' + access_obj);
+        });
     }
 };
 
@@ -52,9 +64,7 @@ AccountantBot.prototype._onMessage = function(msg) {
 };
 
 AccountantBot.prototype._getChannelById = function(channelId) {
-    return this.channels.filter(function (item) {
-        return item.id === channelId;
-    })[0];
+    return this.channels.find(channel => channel.id === channelId);
 };
 
 AccountantBot.prototype._getUserById = function(uid) {

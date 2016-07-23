@@ -16,6 +16,7 @@ var xeroAuth = new XeroAuth(xero_key, xero_secret, host);
 
 var accountant_bot = new AccountantBot({
     token: slack_token,
+    xeroAuth: xeroAuth,
 });
 
 accountant_bot.run();
