@@ -13,7 +13,13 @@ class XeroAuth {
             secret,
             '1.0A',
             'https://' + host + '/xero/authcallback',
-            'HMAC-SHA1'
+            'HMAC-SHA1',
+            undefined,
+            {
+                "Accept": "application/json",
+                "Connection": "close",
+                "User-Agent": "AccountantBot https://github.com/MakerBar/accountant_bot/"
+            }
         );
         this.hostname = host;
     }
