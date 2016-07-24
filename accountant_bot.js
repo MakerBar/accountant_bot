@@ -18,8 +18,6 @@ AccountantBot.prototype._onStart = function() {
     this.user = this.users.filter(function (user) {
         return user.name == self.settings.name;
     })[0];
-
-    this.postMessageToUser('bert', 'I\'m awake!');
 };
 
 AccountantBot.prototype.handleMessage = function(msg) {

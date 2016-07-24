@@ -96,9 +96,7 @@ class XeroAuth {
                 if (res.error) {
                     reject(res.error);
                 }
-                console.log(data);
-                console.log("got", typeof(data), 'back from Xero');
-                resolve(data);
+                resolve(JSON.parse(data));
             });
         });
     }
