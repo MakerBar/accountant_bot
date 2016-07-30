@@ -3,6 +3,7 @@
 var OAuth = require('oauth');
 
 var tokensecrets = {};
+var usertokens = {};
 
 class XeroAuth {
     constructor(key, secret, host) {
@@ -24,25 +25,31 @@ class XeroAuth {
         this.hostname = host;
     }
 
-    getAuthToken() {
+    getAuthToken(user_id) {
         var xa = this;
-        var access_resolve, access_reject;
-        var access_promise = new Promise(function(resolve, reject) {
-            access_resolve = resolve;
-            access_reject = reject;
-        });
-        var request_promise = new Promise(function(resolve, reject) {
-            xa.oauth.getOAuthRequestToken(function(err, oAuthToken, oAuthTokenSecret, results) {
-                if (err) {
-                    reject(err);
-                }
-                if (results.error) {
-                    reject(results.error);
-                }
-                tokensecrets[oAuthToken] = {oAuthTokenSecret, prom: {resolve: access_resolve, reject: access_reject}};
-                resolve("https://api.xero.com/oauth/Authorize?oauth_token=" + oAuthToken);
+        var request_promise, access_promise;
+        if (user_id && usertokens[user_id] && Date.now() < usertokens[user_id].expiration) {
+            request_promise = Promise.resolve();
+            access_promise = Promise.resolve(usertokens[user_id].auth);
+        } else {
+            var access_resolve, access_reject;
+            access_promise = new Promise(function(resolve, reject) {
+                access_resolve = resolve;
+                access_reject = reject;
             });
-        });
+            request_promise = new Promise(function(resolve, reject) {
+                xa.oauth.getOAuthRequestToken(function(err, oAuthToken, oAuthTokenSecret, results) {
+                    if (err) {
+                        reject(err);
+                    }
+                    if (results.error) {
+                        reject(results.error);
+                    }
+                    tokensecrets[oAuthToken] = {oAuthTokenSecret, prom: {resolve: access_resolve, reject: access_reject, user_id: user_id}};
+                    resolve("https://api.xero.com/oauth/Authorize?oauth_token=" + oAuthToken);
+                });
+            });
+        }
         return {request_promise, access_promise};
     }
 
@@ -73,7 +80,11 @@ class XeroAuth {
                 if (results.error) {
                     reject(results.error);
                 }
-                tokensecrets[token].prom.resolve({oAuthAccessToken, oAuthAccessTokenSecret, org});
+                let auth = {oAuthAccessToken, oAuthAccessTokenSecret, org};
+                // xero tokens expire after 30 minutes, so stop using them and force a refresh after 27
+                let expiration = Date.now() + 27 * 60 * 1000;
+                usertokens[tokensecrets[token].user_id] = {expires: expiration, auth: auth};
+                tokensecrets[token].prom.resolve(auth);
                 resolve();
             });
         }).then(function(tok) {

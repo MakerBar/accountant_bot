@@ -32,7 +32,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
     if (command.startsWith('balance sheet')) {
         console.log('sending balance sheet to', channel, 'for', user.name);
         // authorize user
-        let proms = this.xeroAuth.getAuthToken();
+        let proms = this.xeroAuth.getAuthToken(user.id);
         proms.request_promise.then(function(url) {
             ab.postMessageToUser(user.name, 'please go to ' + url + ' to authorize access to Xero');
         });
@@ -46,9 +46,11 @@ AccountantBot.prototype.handleMessage = function(msg) {
     }
     if (command.startsWith('oauth request')) {
         console.log('testing oauth for', user.name);
-        let proms = this.xeroAuth.getAuthToken();
+        let proms = this.xeroAuth.getAuthToken(user.id);
         proms.request_promise.then(function(url) {
-            ab.postMessageToUser(user.name, 'please go to ' + url + ' to authorize access to Xero');
+            if (url) {
+                ab.postMessageToUser(user.name, 'please go to ' + url + ' to authorize access to Xero');
+            }
         });
         let path = msg.text.split(' ');
         proms.access_promise.then(function(access_obj) {
