@@ -45,7 +45,7 @@ class XeroAuth {
                     if (results.error) {
                         reject(results.error);
                     }
-                    tokensecrets[oAuthToken] = {oAuthTokenSecret, prom: {resolve: access_resolve, reject: access_reject, user_id: user_id}};
+                    tokensecrets[oAuthToken] = {oAuthTokenSecret, prom: {resolve: access_resolve, reject: access_reject}, user_id};
                     resolve("https://api.xero.com/oauth/Authorize?oauth_token=" + oAuthToken);
                 });
             });
@@ -82,7 +82,7 @@ class XeroAuth {
                 }
                 let auth = {oAuthAccessToken, oAuthAccessTokenSecret, org};
                 // xero tokens expire after 30 minutes, so stop using them and force a refresh after 27
-                let expiration = Date.now() + 27 * 60 * 1000;
+                let expiration = Date.now() + (27 * 60 * 1000);
                 usertokens[tokensecrets[token].user_id] = {expires: expiration, auth: auth};
                 tokensecrets[token].prom.resolve(auth);
                 resolve();
