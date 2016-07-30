@@ -83,7 +83,7 @@ class XeroAuth {
                 let auth = {oAuthAccessToken, oAuthAccessTokenSecret, org};
                 // xero tokens expire after 30 minutes, so stop using them and force a refresh after 27
                 let expiration = Date.now() + (27 * 60 * 1000);
-                usertokens[tokensecrets[token].user_id] = {expires: expiration, auth: auth};
+                usertokens[tokensecrets[token].user_id] = {expiration, auth};
                 tokensecrets[token].prom.resolve(auth);
                 resolve();
             });
