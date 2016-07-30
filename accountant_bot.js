@@ -24,11 +24,12 @@ AccountantBot.prototype.handleMessage = function(msg) {
     let ab = this;
     var channel = this._getChannelById(msg.channel);
     var user = this._getUserById(msg.user);
-    if (msg.text == 'report') {
+    let command = msg.text.toLowerCase();
+    if (command.startsWith('report')) {
         console.log('reporting to', channel, 'for', user.name);
         this.postMessage(msg.channel, "report .. report ... report...");
     }
-    if (msg.text == 'balance sheet') {
+    if (command.startsWith('balance sheet')) {
         console.log('sending balance sheet to', channel, 'for', user.name);
         // authorize user
         let proms = this.xeroAuth.getAuthToken();
@@ -37,6 +38,21 @@ AccountantBot.prototype.handleMessage = function(msg) {
         });
         proms.access_promise.then(function(access_obj) {
             return ab.xeroAuth.get('api.xro/2.0/Reports/BalanceSheet', access_obj);
+        }).then(bs => {
+            ab.postMessage(msg.channel, JSON.stringify(bs));
+        }).catch(err => {
+            ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
+        });
+    }
+    if (command.startsWith('oauth request')) {
+        console.log('testing oauth for', user.name);
+        let proms = this.xeroAuth.getAuthToken();
+        proms.request_promise.then(function(url) {
+            ab.postMessageToUser(user.name, 'please go to ' + url + ' to authorize access to Xero');
+        });
+        let path = msg.text.split(' ');
+        proms.access_promise.then(function(access_obj) {
+            return ab.xeroAuth.get(path[2], access_obj);
         }).then(bs => {
             ab.postMessage(msg.channel, JSON.stringify(bs));
         }).catch(err => {
