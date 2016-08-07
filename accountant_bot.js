@@ -57,7 +57,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         getAuthToken(this, user).then(function(access_obj) {
             return ab.xeroAuth.get(path[2], access_obj);
         }).then(bs => {
-            ab.postMessage(msg.channel, JSON.stringify(bs));
+            ab.postMessage(msg.channel, ```JSON.stringify(bs)```);
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
         });
