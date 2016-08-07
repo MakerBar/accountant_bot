@@ -74,7 +74,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                         if (!account_summaries[li.AccountCode]) {
                             account_summaries[li.AccountCode] = {};
                         }
-                        let acc_summ = account_summaries[li.accountCode];
+                        let acc_summ = account_summaries[li.AccountCode];
                         if (!acc_summ[contact_id]) {
                             acc_summ[contact_id] = {
                                 amount: 0,
