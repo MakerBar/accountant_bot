@@ -12,7 +12,6 @@ var xero_secret = process.env.XERO_SECRET;
 var host = process.env.FQDN;
 
 var xeroAuth = new XeroAuth(xero_key, xero_secret, host);
-//xeroAuth.get('https://api.xero.com/api.xro/2.0/Users');
 
 var accountant_bot = new AccountantBot({
     token: slack_token,
