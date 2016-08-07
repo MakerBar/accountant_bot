@@ -46,7 +46,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         getAuthToken(this, user).then(function(access_obj) {
             return ab.xeroAuth.get('api.xro/2.0/Reports/BalanceSheet', access_obj);
         }).then(bs => {
-            ab.postMessage(msg.channel, formatReport(bs.Reports[0]));
+            ab.postMessage(msg.channel, '```' + formatReport(bs.Reports[0]) + '```');
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
         });
