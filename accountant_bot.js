@@ -58,7 +58,8 @@ AccountantBot.prototype.handleMessage = function(msg) {
             return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
         }).then(function(bank_trans) {
             let contact_trans = {};
-            bank_trans.forEach(function(t) {
+            // transfers don't have contacts, so filter those out
+            bank_trans.filter(t => t.Contact).forEach(function(t) {
                 if (!contact_trans[t.Contact.ContactID]) {
                     contact_trans[t.Contact.ContactID] = [];
                 }
