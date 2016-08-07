@@ -100,7 +100,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
             });
             ab.postMessage(msg.channel, '```' + report + '```');
         }).catch(err => {
-            ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
+            ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
         });
     }
     if (command.startsWith('oauth request')) {
