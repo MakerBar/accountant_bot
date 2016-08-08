@@ -38,10 +38,6 @@ AccountantBot.prototype.handleMessage = function(msg) {
     var channel = this._getChannelById(msg.channel);
     var user = this._getUserById(msg.user);
     let command = msg.text.toLowerCase();
-    if (command.startsWith('report')) {
-        console.log('reporting to', channel, 'for', user.name);
-        this.postMessage(msg.channel, "report .. report ... report...");
-    }
     if (command.startsWith('balance sheet')) {
         console.log('sending balance sheet to', channel, 'for', user.name);
         getAuthToken(this, user).then(function(access_obj) {
