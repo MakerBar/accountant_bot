@@ -126,11 +126,9 @@ AccountantBot.prototype._onMessage = function(msg) {
     console.log(msg);
     console.log("-----------");
     if (msg.type == 'message') {
-        if (msg.channel[0] == 'C') {
-            this.handleMessage(msg);
-        } else if (msg.channel[0] == 'D') {
-            this.handleMessage(msg);
-        }
+        // you can tell the type of message based on the first character of msg.channel
+        // C = channel, D = direct, G = (private) group
+        this.handleMessage(msg);
     }
 };
 
