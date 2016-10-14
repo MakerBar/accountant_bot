@@ -86,7 +86,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                     });
                 });
             });
-            ['4730', '4731'].forEach(function(acc) {
+            ['4730', '4731', '4732'].forEach(function(acc) {
                 report += acc + '\n';
                 report += Object.keys(account_summaries[acc]).map(function(contact_id) {
                     let contact_info = contact_trans[contact_id][0].Contact;
