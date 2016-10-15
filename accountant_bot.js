@@ -86,9 +86,17 @@ AccountantBot.prototype.handleMessage = function(msg) {
                     });
                 });
             });
-            ['4730', '4731', '4732'].forEach(function(acc) {
+            ['4730', '4732', '4731'].forEach(function(acc) {
                 report += acc + '\n';
-                report += Object.keys(account_summaries[acc]).map(function(contact_id) {
+                report += Object.keys(account_summaries[acc])
+                .sort(function(contact_a, contact_b) {
+                    if (contact_a.name < contact_b.name) {
+                        return -1;
+                    } else if (contact_a.name > contact_b.name) {
+                        return 1;
+                    }
+                    return 0;
+                }).map(function(contact_id) {
                     let contact_info = contact_trans[contact_id][0].Contact;
                     let summ = account_summaries[acc][contact_id];
                     return contact_info.Name + ' $' + summ.amount + ' ' + summ.most_recent.toISOString();
