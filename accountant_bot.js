@@ -89,7 +89,9 @@ AccountantBot.prototype.handleMessage = function(msg) {
             ['4730', '4732', '4731'].forEach(function(acc) {
                 report += acc + '\n';
                 report += Object.keys(account_summaries[acc])
-                .sort(function(contact_a, contact_b) {
+                .sort(function(id_a, id_b) {
+                    let contact_a = contact_trans[id_a][0].Contact;
+                    let contact_b = contact_trans[id_b][0].Contact;
                     if (contact_a.name < contact_b.name) {
                         return -1;
                     } else if (contact_a.name > contact_b.name) {
