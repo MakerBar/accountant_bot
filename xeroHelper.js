@@ -13,7 +13,9 @@ function getBankTransactions(xeroAuth, access_obj) {
             }
         });
     }
-    return fetchBT(1);
+    return fetchBT(1).then((trans) => {
+        return trans.filter(t => t.Status != 'DELETED');
+    });
 }
 
 function groupByContact(bank_trans) {
