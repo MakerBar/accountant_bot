@@ -120,7 +120,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 if (!c.Name) {
                     console.log(c);
                 }
-                return c.Name && c.Name.toLowerCase.indexOf(query.toLowerCase()) > -1;
+                return c.Name && c.Name.toLowerCase().indexOf(query.toLowerCase()) > -1;
             });
             if (matching_contacts.length === 0) {
                 throw "Sorry, no contacts found for " + query;
