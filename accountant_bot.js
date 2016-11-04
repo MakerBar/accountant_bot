@@ -108,6 +108,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         const query = command.slice(prefix.length).trim();
         if (!query) {
             ab.postMessage(msg.channel, "Sorry, I need to know who you want a statement for.");
+            return;
         }
         console.log('sending member report to', channel, 'for', user.name);
         getAuthToken(this, user).then(function(access_obj) {
@@ -116,17 +117,21 @@ AccountantBot.prototype.handleMessage = function(msg) {
             const contact_trans = xeroHelper.groupByContact(bank_trans);
             const contacts = Object.keys(contact_trans).map(id => contact_trans[id][0].Contact);
             let matching_contacts = contacts.filter(c => {
-                return c.name.toLowerCase.indexOf(query.toLowerCase()) > -1;
+                if (!c.name) {
+                    console.log(c);
+                }
+                return c.name && c.name.toLowerCase.indexOf(query.toLowerCase()) > -1;
             });
             if (matching_contacts.length === 0) {
-                ab.postMessage(msg.channel, "Sorry, no contacts found for " + query);
+                throw "Sorry, no contacts found for " + query;
             } else if (matching_contacts.length === 1) {
                 console.log("reporting for", matching_contacts[0].name);
                 console.log(matching_contacts[0]);
+                ab.postMessage(msg.channel, "Found: " + matching_contacts[0].name);
             } else {
                 let msg = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
                 matching_contacts.forEach(c => {msg += c.name + '\n';});
-                ab.postMessage(msg.channel, msg);
+                throw msg;
             }
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
