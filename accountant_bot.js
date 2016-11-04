@@ -110,7 +110,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
             ab.postMessage(msg.channel, "Sorry, I need to know who you want a statement for.");
             return;
         }
-        console.log('sending member report to', channel, 'for', user.name);
+        console.log('sending statement to', channel, 'for', user.name);
         getAuthToken(this, user).then(function(access_obj) {
             return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
         }).then((bank_trans) => {
@@ -126,12 +126,23 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 throw "Sorry, no contacts found for " + query;
             } else if (matching_contacts.length === 1) {
                 console.log("reporting for", matching_contacts[0].Name);
-                console.log(matching_contacts[0]);
-                ab.postMessage(msg.channel, "Found: " + matching_contacts[0].Name);
+                const match = matching_contacts[0];
+                ab.postMessage(msg.channel, "Report for: " + match.Name);
+                let trans = contact_trans[match.ContactID];
+                let result = "";
+                trans.forEach(function(tran) {
+                    console.log(tran);
+                    result += tran.DateString + '\n';
+                    tran.LineItems.forEach(function(li) {
+                        console.log(li);
+                        result += li.AccountCode + ": " + li.LineAmount + '\n';
+                    });
+                });
+                ab.postMessage(msg.channel, result);
             } else {
-                let msg = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
-                matching_contacts.forEach(c => {msg += c.Name + '\n';});
-                throw msg;
+                let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
+                matching_contacts.forEach(c => {result += c.Name + '\n';});
+                throw result;
             }
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
