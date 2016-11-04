@@ -53,14 +53,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         getAuthToken(this, user).then(function(access_obj) {
             return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
         }).then(function(bank_trans) {
-            let contact_trans = {};
-            // transfers don't have contacts, so filter those out
-            bank_trans.filter(t => t.Contact).forEach(function(t) {
-                if (!contact_trans[t.Contact.ContactID]) {
-                    contact_trans[t.Contact.ContactID] = [];
-                }
-                contact_trans[t.Contact.ContactID].push(t);
-            });
+            let contact_trans = xeroHelper.groupByContact(bank_trans);
             let report = 'Member Report\n\n';
             let account_summaries = {};
             Object.keys(contact_trans).forEach(function(contact_id) {
@@ -108,6 +101,15 @@ AccountantBot.prototype.handleMessage = function(msg) {
             ab.postMessage(msg.channel, '```' + report + '```');
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
+        });
+    }
+    if (command.startsWith('statement')) {
+        console.log('sending member report to', channel, 'for', user.name);
+        getAuthToken(this, user).then(function(access_obj) {
+            return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
+        }).then((bank_trans) => {
+            const contact_trans = xeroHelper.groupByContact(bank_trans);
+            console.log(Object.keys(contact_trans));
         });
     }
     if (command.startsWith('oauth request')) {
