@@ -109,7 +109,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
             return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
         }).then((bank_trans) => {
             const contact_trans = xeroHelper.groupByContact(bank_trans);
-            const contacts = Object.keys(contact_trans).map(id => contact_trans[id]);
+            const contacts = Object.keys(contact_trans).map(id => contact_trans[id][0].Contact);
             console.log(contacts);
             console.log(contacts[0]);
         });
