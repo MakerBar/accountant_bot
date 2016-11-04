@@ -85,9 +85,9 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 .sort(function(id_a, id_b) {
                     let contact_a = contact_trans[id_a][0].Contact;
                     let contact_b = contact_trans[id_b][0].Contact;
-                    if (contact_a.name < contact_b.name) {
+                    if (contact_a.Name < contact_b.Name) {
                         return -1;
-                    } else if (contact_a.name > contact_b.name) {
+                    } else if (contact_a.Name > contact_b.Name) {
                         return 1;
                     }
                     return 0;
@@ -117,20 +117,20 @@ AccountantBot.prototype.handleMessage = function(msg) {
             const contact_trans = xeroHelper.groupByContact(bank_trans);
             const contacts = Object.keys(contact_trans).map(id => contact_trans[id][0].Contact);
             let matching_contacts = contacts.filter(c => {
-                if (!c.name) {
+                if (!c.Name) {
                     console.log(c);
                 }
-                return c.name && c.name.toLowerCase.indexOf(query.toLowerCase()) > -1;
+                return c.Name && c.Name.toLowerCase.indexOf(query.toLowerCase()) > -1;
             });
             if (matching_contacts.length === 0) {
                 throw "Sorry, no contacts found for " + query;
             } else if (matching_contacts.length === 1) {
-                console.log("reporting for", matching_contacts[0].name);
+                console.log("reporting for", matching_contacts[0].Name);
                 console.log(matching_contacts[0]);
-                ab.postMessage(msg.channel, "Found: " + matching_contacts[0].name);
+                ab.postMessage(msg.channel, "Found: " + matching_contacts[0].Name);
             } else {
                 let msg = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
-                matching_contacts.forEach(c => {msg += c.name + '\n';});
+                matching_contacts.forEach(c => {msg += c.Name + '\n';});
                 throw msg;
             }
         }).catch(err => {
