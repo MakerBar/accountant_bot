@@ -104,14 +104,32 @@ AccountantBot.prototype.handleMessage = function(msg) {
         });
     }
     if (command.startsWith('statement')) {
+        const prefix = 'statement ';
+        const query = command.slice(prefix.length).trim();
+        if (!query) {
+            ab.postMessage(msg.channel, "Sorry, I need to know who you want a statement for.");
+        }
         console.log('sending member report to', channel, 'for', user.name);
         getAuthToken(this, user).then(function(access_obj) {
             return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
         }).then((bank_trans) => {
             const contact_trans = xeroHelper.groupByContact(bank_trans);
             const contacts = Object.keys(contact_trans).map(id => contact_trans[id][0].Contact);
-            console.log(contacts);
-            console.log(contacts[0]);
+            let matching_contacts = contacts.filter(c => {
+                return c.name.toLowerCase.indexOf(query.toLowerCase()) > -1;
+            });
+            if (matching_contacts.length === 0) {
+                ab.postMessage(msg.channel, "Sorry, no contacts found for " + query);
+            } else if (matching_contacts.length === 1) {
+                console.log("reporting for", matching_contacts[0].name);
+                console.log(matching_contacts[0]);
+            } else {
+                let msg = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
+                matching_contacts.forEach(c => {msg += c.name + '\n';});
+                ab.postMessage(msg.channel, msg);
+            }
+        }).catch(err => {
+            ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
         });
     }
     if (command.startsWith('oauth request')) {
