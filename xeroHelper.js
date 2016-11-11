@@ -40,7 +40,7 @@ function groupByTypeAndAccount(trans) {
             if (!res[tran.Type.toLowerCase()][li.AccountCode]) {
                 res[tran.Type.toLowerCase()][li.AccountCode] = {
                     sum: 0,
-                    Transactions: []
+                    transactions: []
                 };
             }
             if (res[tran.Type.toLowerCase()][li.AccountCode].transactions.indexOf(tran) === -1) {
