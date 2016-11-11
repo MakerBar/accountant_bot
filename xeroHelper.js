@@ -30,6 +30,28 @@ function groupByContact(bank_trans) {
     return contact_trans;
 }
 
+function groupByTypeAndAccount(trans) {
+    const res = {
+        spend: {},
+        receive: {}
+    };
+    trans.forEach((tran) => {
+        tran.LineItems.forEach((li) => {
+            if (!res[tran.Type.toLowerCase()][li.AccountCode]) {
+                res[tran.Type.toLowerCase()][li.AccountCode] = {
+                    sum: 0,
+                    Transactions: []
+                };
+            }
+            if (res[tran.Type.toLowerCase()][li.AccountCode].transactions.indexOf(tran) === -1) {
+                res[tran.Type.toLowerCase()][li.AccountCode].transactions.push(tran);
+            }
+            res[tran.Type.toLowerCase()][li.AccountCode].sum += li.LineAmount;
+        });
+    });
+    return res;
+}
+
 function transactionByDate(a, b) {
     const aDate = new Date(a.DateString);
     const bDate = new Date(b.DateString);
@@ -44,5 +66,6 @@ function transactionByDate(a, b) {
 module.exports = {
     getBankTransactions,
     groupByContact,
+    groupByTypeAndAccount,
     transactionByDate,
 };

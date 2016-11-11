@@ -128,8 +128,13 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 console.log("reporting for", matching_contacts[0].Name);
                 const match = matching_contacts[0];
                 ab.postMessage(msg.channel, "Report for: " + match.Name);
-                let trans = contact_trans[match.ContactID];
+                let trans = contact_trans[match.ContactID].sort(xeroHelper.transactionByDate);
                 let result = "";
+
+                let summary = xeroHelper.groupByTypeAndAccount(trans);
+                console.log(summary);
+                // TODO: format and return summary;
+
                 trans.sort(xeroHelper.transactionByDate).forEach(function(tran) {
                     console.log(tran);
                     result += tran.DateString + '\n';
@@ -137,6 +142,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                         result += li.AccountCode + ": " + li.LineAmount + '\n';
                     });
                 });
+
                 ab.postMessage(msg.channel, result);
             } else {
                 let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
@@ -155,6 +161,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         }).then(bs => {
             ab.postMessage(msg.channel, ```JSON.stringify(bs)```);
         }).catch(err => {
+            console.log(String(err), err);
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
         });
     }
