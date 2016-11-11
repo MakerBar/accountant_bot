@@ -30,7 +30,19 @@ function groupByContact(bank_trans) {
     return contact_trans;
 }
 
+function transactionByDate(a, b) {
+    const aDate = new Date(a.DateString);
+    const bDate = new Date(b.DateString);
+    if (aDate < bDate) {
+        return -1;
+    } else if (aDate > bDate) {
+        return 1;
+    }
+    return 0;
+}
+
 module.exports = {
     getBankTransactions,
-    groupByContact
+    groupByContact,
+    transactionByDate,
 };

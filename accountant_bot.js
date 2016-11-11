@@ -130,11 +130,10 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 ab.postMessage(msg.channel, "Report for: " + match.Name);
                 let trans = contact_trans[match.ContactID];
                 let result = "";
-                trans.forEach(function(tran) {
+                trans.sort(xeroHelper.transactionByDate).forEach(function(tran) {
                     console.log(tran);
                     result += tran.DateString + '\n';
                     tran.LineItems.forEach(function(li) {
-                        console.log(li);
                         result += li.AccountCode + ": " + li.LineAmount + '\n';
                     });
                 });
