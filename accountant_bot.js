@@ -5,7 +5,7 @@ var Bot = require('slackbots');
 var formatReport = require('./reportformatter');
 var xeroHelper = require('./xeroHelper');
 
-const snippetEscape = (str) => '```${str}```';
+const snippetEscape = (str) => '```' + str + '```';
 
 var AccountantBot = function Constructor(settings, xeroAuth) {
     this.settings = settings;
