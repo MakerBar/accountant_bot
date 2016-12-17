@@ -5,6 +5,8 @@ var Bot = require('slackbots');
 var formatReport = require('./reportformatter');
 var xeroHelper = require('./xeroHelper');
 
+const snippetEscape = (str) => {'```${str}```'};
+
 var AccountantBot = function Constructor(settings, xeroAuth) {
     this.settings = settings;
     this.settings.name = this.settings.name || 'accountant_bot';
@@ -43,7 +45,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         getAuthToken(this, user).then(function(access_obj) {
             return ab.xeroAuth.get('api.xro/2.0/Reports/BalanceSheet', access_obj);
         }).then(bs => {
-            ab.postMessage(msg.channel, '```' + formatReport(bs.Reports[0]) + '```');
+            ab.postMessage(msg.channel, snippetEscape(formatReport(bs.Reports[0])));
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
         });
@@ -98,7 +100,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 }).join('\n');
                 report += '\n';
             });
-            ab.postMessage(msg.channel, '```' + report + '```');
+            ab.postMessage(msg.channel, snippetEscape(report));
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
         });
@@ -143,7 +145,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                     });
                 });
 
-                ab.postMessage(msg.channel, result);
+                ab.postMessage(msg.channel, snippetEscape(result));
             } else {
                 let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
                 matching_contacts.forEach(c => {result += c.Name + '\n';});
@@ -159,7 +161,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
         getAuthToken(this, user).then(function(access_obj) {
             return ab.xeroAuth.get(path[2], access_obj);
         }).then(bs => {
-            ab.postMessage(msg.channel, ```JSON.stringify(bs)```);
+            ab.postMessage(msg.channel, snippetEscape(JSON.stringify(bs)));
         }).catch(err => {
             console.log(String(err), err);
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));
