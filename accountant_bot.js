@@ -136,7 +136,29 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 let summary = xeroHelper.groupByTypeAndAccount(trans);
                 console.log(summary);
                 // TODO: format and return summary;
-
+                // desired text format
+                // TOTAL: $XX
+                // TOTAL CHARITABLE: $XX
+                //
+                // ACCOUNT NAME: $XX
+                // ACCOUNT2 NAME: $XX
+                //
+                // DATE - $XX - ACCOUNT NAME [- Description]
+                ///////////////////////////////////
+                // desired data format
+                // {
+                //     total: 1111,
+                //     charitableTotal: 1111,
+                //     lines: {
+                //         [accountCode]: {
+                //             name: 'Account Name'
+                //             total: 11111
+                //             transactions: [
+                //                 ...
+                //             ]
+                //         }
+                //     }
+                // }
                 trans.sort(xeroHelper.transactionByDate).forEach(function(tran) {
                     console.log(tran);
                     result += tran.DateString + '\n';
@@ -146,6 +168,13 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 });
 
                 ab.postMessage(msg.channel, snippetEscape(result));
+
+                let report = '';
+                for (const accountCode in summary.receive) {
+                    // TODO: find a way to convert accountCode to name
+                    report += accountCode + ": " + summary.receive[accountCode].sum + '\n';
+                }
+                ab.postMessage(msg.channel, snippetEscape(report));
             } else {
                 let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
                 matching_contacts.forEach(c => {result += c.Name + '\n';});
