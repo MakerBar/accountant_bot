@@ -7,13 +7,14 @@ var usertokens = {};
 
 class XeroAuth {
     constructor(key, secret, host) {
+        const protocol = process.env.PROTOCOL || 'https://'
         this.oauth = new OAuth.OAuth(
             'https://api.xero.com/oauth/RequestToken',
             'https://api.xero.com/oauth/AccessToken',
             key,
             secret,
             '1.0A',
-            'https://' + host + '/xero/authcallback',
+            protocol + host + '/xero/authcallback',
             'HMAC-SHA1',
             undefined,
             {
@@ -22,7 +23,6 @@ class XeroAuth {
                 "User-Agent": "AccountantBot https://github.com/MakerBar/accountant_bot/"
             }
         );
-        this.hostname = host;
     }
 
     getAuthToken(user_id) {
