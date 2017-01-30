@@ -114,8 +114,11 @@ AccountantBot.prototype.handleMessage = function(msg) {
         }
         console.log('sending statement to', channel, 'for', user.name);
         getAuthToken(this, user).then(function(access_obj) {
-            return xeroHelper.getBankTransactions(ab.xeroAuth, access_obj);
-        }).then((bank_trans) => {
+            return Promise.all([
+                xeroHelper.getBankTransactions(ab.xeroAuth, access_obj),
+                xeroHelper.getAccountsByCode(ab.xeroAuth, access_obj)
+            ]);
+        }).then(([bank_trans, accounts]) => {
             const contact_trans = xeroHelper.groupByContact(bank_trans);
             const contacts = Object.keys(contact_trans).map(id => contact_trans[id][0].Contact);
             let matching_contacts = contacts.filter(c => {
@@ -172,7 +175,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 let report = '';
                 for (const accountCode in summary.receive) {
                     // TODO: find a way to convert accountCode to name
-                    report += accountCode + ": " + summary.receive[accountCode].sum + '\n';
+                    report += accounts[accountCode].Name + ": " + summary.receive[accountCode].sum + '\n';
                 }
                 ab.postMessage(msg.channel, snippetEscape(report));
             } else {

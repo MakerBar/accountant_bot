@@ -1,5 +1,22 @@
 'use strict';
 
+function getAccountDetails(xeroAuth, access_obj) {
+    return xeroAuth.get('api.xro/2.0/Accounts', access_obj)
+    .then((acRes) => acRes.Accounts);
+}
+
+function getAccountsByCode(xeroAuth, access_obj) {
+    return getAccountDetails(xeroAuth, access_obj)
+    .then((accounts) => {
+        return accounts.reduce((idxObj, account) => {
+            if (account.Code) {
+                idxObj[account.Code] = account;
+            }
+            return idxObj;
+        }, {});
+    });
+}
+
 function getBankTransactions(xeroAuth, access_obj) {
     function fetchBT(page) {
         return xeroAuth.get('api.xro/2.0/BankTransactions?page=' + String(page), access_obj).then(function(bt) {
@@ -64,6 +81,7 @@ function transactionByDate(a, b) {
 }
 
 module.exports = {
+    getAccountsByCode,
     getBankTransactions,
     groupByContact,
     groupByTypeAndAccount,
