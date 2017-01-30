@@ -5,9 +5,9 @@ var Bot = require('slackbots');
 var formatReport = require('./reportformatter');
 var xeroHelper = require('./xeroHelper');
 
-const snippetEscape = (str) => '```' + str + '```';
+const snippetEscape = (str) => '```\n' + str + '\n```';
 
-var AccountantBot = function Constructor(settings, xeroAuth) {
+var AccountantBot = function(settings, xeroAuth) {
     this.settings = settings;
     this.settings.name = this.settings.name || 'accountant_bot';
     this.user = null;
@@ -189,8 +189,9 @@ AccountantBot.prototype.handleMessage = function(msg) {
         let path = msg.text.split(' ');
         getAuthToken(this, user).then(function(access_obj) {
             return ab.xeroAuth.get(path[2], access_obj);
-        }).then(bs => {
-            ab.postMessage(msg.channel, snippetEscape(JSON.stringify(bs)));
+        }).then(result => {
+            console.log(result);
+            ab.postMessage(msg.channel, snippetEscape(JSON.stringify(result)));
         }).catch(err => {
             console.log(String(err), err);
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + JSON.stringify(err));

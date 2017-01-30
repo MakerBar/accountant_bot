@@ -103,11 +103,14 @@ class XeroAuth {
             this.oauth.get('https://api.xero.com/' + path, auth.oAuthAccessToken, auth.oAuthAccessTokenSecret, function(err, data, res) {
                 if (err) {
                     reject(err);
+                    return;
                 }
-                if (res.error) {
+                if (res && res.error) {
                     reject(res.error);
+                    return
                 }
                 resolve(JSON.parse(data));
+                return;
             });
         });
     }
