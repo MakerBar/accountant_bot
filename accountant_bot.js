@@ -119,6 +119,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
                 xeroHelper.getAccountsByCode(ab.xeroAuth, access_obj)
             ]);
         }).then(([bank_trans, accounts]) => {
+            bank_trans = bank_trans.filter(t => t.Type == 'RECEIVE'); // filter out spends
             const contact_trans = xeroHelper.groupByContact(bank_trans);
             const contacts = Object.keys(contact_trans).map(id => contact_trans[id][0].Contact);
             let matching_contacts = contacts.filter(c => {
@@ -130,54 +131,39 @@ AccountantBot.prototype.handleMessage = function(msg) {
             if (matching_contacts.length === 0) {
                 throw "Sorry, no contacts found for " + query;
             } else if (matching_contacts.length === 1) {
-                console.log("reporting for", matching_contacts[0].Name);
+                console.log("reporting for", matching_contacts[0]);
                 const match = matching_contacts[0];
-                ab.postMessage(msg.channel, "Report for: " + match.Name);
                 let trans = contact_trans[match.ContactID].sort(xeroHelper.transactionByDate);
-                let result = "";
+                let result = "Statement of receipt from " + match.Name + "\n\n";
 
                 let summary = xeroHelper.groupByTypeAndAccount(trans);
-                console.log(summary);
-                // TODO: format and return summary;
-                // desired text format
-                // TOTAL: $XX
-                // TOTAL CHARITABLE: $XX
-                //
-                // ACCOUNT NAME: $XX
-                // ACCOUNT2 NAME: $XX
-                //
-                // DATE - $XX - ACCOUNT NAME [- Description]
-                ///////////////////////////////////
-                // desired data format
-                // {
-                //     total: 1111,
-                //     charitableTotal: 1111,
-                //     lines: {
-                //         [accountCode]: {
-                //             name: 'Account Name'
-                //             total: 11111
-                //             transactions: [
-                //                 ...
-                //             ]
-                //         }
-                //     }
-                // }
+                result += 'Transaction Detail\n\n';
                 trans.sort(xeroHelper.transactionByDate).forEach(function(tran) {
-                    console.log(tran);
-                    result += tran.DateString + '\n';
                     tran.LineItems.forEach(function(li) {
-                        result += li.AccountCode + ": " + li.LineAmount + '\n';
+                        let description = li.Tracking.map(t => {
+                            return t.Name + ": " + t.Option;
+                        }).join('\n');
+                        if (li.Description) {
+                            if (description.length > 0) {
+                                description + ' - ';
+                            }
+                            description += li.Description;
+                        }
+                        result += tran.DateString.split('T')[0] + ' - ' +
+                            '$' + parseFloat(li.LineAmount).toFixed(2) + ' - ' +
+                            accounts[li.AccountCode].Name + ' - ' +
+                            description +
+                            '\n';
                     });
                 });
 
-                ab.postMessage(msg.channel, snippetEscape(result));
+                result += '\n\nSummary By Account\n\n'
 
-                let report = '';
                 for (const accountCode in summary.receive) {
-                    // TODO: find a way to convert accountCode to name
-                    report += accounts[accountCode].Name + ": " + summary.receive[accountCode].sum + '\n';
+                    const sum = parseFloat(summary.receive[accountCode].sum).toFixed(2);
+                    result += accounts[accountCode].Name + ": " + sum + '\n';
                 }
-                ab.postMessage(msg.channel, snippetEscape(report));
+                ab.postMessage(msg.channel, snippetEscape(result));
             } else {
                 let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
                 matching_contacts.forEach(c => {result += c.Name + '\n';});
