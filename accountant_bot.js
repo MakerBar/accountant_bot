@@ -4,6 +4,7 @@ var util = require('util');
 var Bot = require('slackbots');
 var formatReport = require('./reportformatter');
 var xeroHelper = require('./xeroHelper');
+var {makeStatement} = require('./statement.js');
 
 const snippetEscape = (str) => '```\n' + str + '\n```';
 
@@ -131,38 +132,7 @@ AccountantBot.prototype.handleMessage = function(msg) {
             if (matching_contacts.length === 0) {
                 throw "Sorry, no contacts found for " + query;
             } else if (matching_contacts.length === 1) {
-                console.log("reporting for", matching_contacts[0]);
-                const match = matching_contacts[0];
-                let trans = contact_trans[match.ContactID].sort(xeroHelper.transactionByDate);
-                let result = "Statement of receipt from " + match.Name + "\n\n";
-
-                let summary = xeroHelper.groupByTypeAndAccount(trans);
-                result += 'Transaction Detail\n\n';
-                trans.sort(xeroHelper.transactionByDate).forEach(function(tran) {
-                    tran.LineItems.forEach(function(li) {
-                        let description = li.Tracking.map(t => {
-                            return t.Name + ": " + t.Option;
-                        }).join('\n');
-                        if (li.Description) {
-                            if (description.length > 0) {
-                                description + ' - ';
-                            }
-                            description += li.Description;
-                        }
-                        result += tran.DateString.split('T')[0] + ' - ' +
-                            '$' + parseFloat(li.LineAmount).toFixed(2) + ' - ' +
-                            accounts[li.AccountCode].Name + ' - ' +
-                            description +
-                            '\n';
-                    });
-                });
-
-                result += '\n\nSummary By Account\n\n'
-
-                for (const accountCode in summary.receive) {
-                    const sum = parseFloat(summary.receive[accountCode].sum).toFixed(2);
-                    result += accounts[accountCode].Name + ": " + sum + '\n';
-                }
+                let result = makeStatement(matching_contacts[0], bank_trans, accounts);
                 ab.postMessage(msg.channel, snippetEscape(result));
             } else {
                 let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
