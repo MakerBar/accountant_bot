@@ -6,7 +6,15 @@ function makeStatement(contact, bank_trans, accounts) {
     console.log("creating statement", contact);
     const contact_trans = xeroHelper.groupByContact(bank_trans);
     const trans = contact_trans[contact.ContactID];
-    let result = "Statement of receipt from " + contact.Name + "\n\n";
+    if (!trans || trans.length == 0) {
+        console.log("failed to create statement due to lack of transactions")
+        return;
+    }
+    let result = "Statement of receipt from " + contact.Name;
+    if (contact.EmailAddress) {
+        result += ' (' + contact.EmailAddress + ')';
+    }
+    result += "\n\n";
 
     result += 'Transaction Detail\n\n';
     trans.sort(xeroHelper.transactionByDate).forEach(function(tran) {

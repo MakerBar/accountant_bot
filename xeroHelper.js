@@ -1,5 +1,22 @@
 'use strict';
 
+function getPagedResource(resourceName, xeroAuth, access_obj) {
+    function fetchResource(page = 1) {
+        return xeroAuth.get('api.xro/2.0/' + resourceName + '?page=' + String(page), access_obj)
+        .then((items) => {
+            let newItems = items[resourceName];
+            if (newItems.length == 100) {
+                return fetchResource(page + 1).then((moreItems) => {
+                    return newItems.concat(moreItems);
+                });
+            } else {
+                return newItems;
+            }
+        });
+    }
+    return fetchResource;
+}
+
 function getAccountDetails(xeroAuth, access_obj) {
     return xeroAuth.get('api.xro/2.0/Accounts', access_obj)
     .then((acRes) => acRes.Accounts);
@@ -18,21 +35,8 @@ function getAccountsByCode(xeroAuth, access_obj) {
 }
 
 function getBankTransactions(xeroAuth, access_obj) {
-    function fetchBT(page) {
-        return xeroAuth.get('api.xro/2.0/BankTransactions?page=' + String(page), access_obj).then(function(bt) {
-            let new_trans = bt.BankTransactions;
-            if (new_trans.length == 100) {
-                return fetchBT(page + 1).then(function(trans) {
-                    return new_trans.concat(trans);
-                });
-            } else {
-                return new_trans;
-            }
-        });
-    }
-    return fetchBT(1).then((trans) => {
-        return trans.filter(t => t.Status != 'DELETED');
-    });
+    return getPagedResource('BankTransactions', xeroAuth, access_obj)()
+    .then((trans) => trans.filter(t => t.Status != 'DELETED'));
 }
 
 function groupByContact(bank_trans) {
@@ -80,10 +84,15 @@ function transactionByDate(a, b) {
     return 0;
 }
 
+function getContactDetails(xeroAuth, access_obj) {
+    return getPagedResource('Contacts', xeroAuth, access_obj)();
+}
+
 module.exports = {
     getAccountsByCode,
     getBankTransactions,
     groupByContact,
     groupByTypeAndAccount,
     transactionByDate,
+    getContactDetails,
 };

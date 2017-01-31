@@ -132,13 +132,33 @@ AccountantBot.prototype.handleMessage = function(msg) {
             if (matching_contacts.length === 0) {
                 throw "Sorry, no contacts found for " + query;
             } else if (matching_contacts.length === 1) {
-                let result = makeStatement(matching_contacts[0], bank_trans, accounts);
+                const result = makeStatement(matching_contacts[0], bank_trans, accounts);
                 ab.postMessage(msg.channel, snippetEscape(result));
             } else {
                 let result = "Found multiple contacts for: " + query + "\nWho did you mean?\n";
                 matching_contacts.forEach(c => {result += c.Name + '\n';});
                 throw result;
             }
+        }).catch(err => {
+            ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
+        });
+    }
+    if (command.startsWith('annual statements')) {
+        getAuthToken(this, user).then((access_obj) => {
+            return Promise.all([
+                xeroHelper.getContactDetails(this.xeroAuth, access_obj),
+                xeroHelper.getBankTransactions(ab.xeroAuth, access_obj),
+                xeroHelper.getAccountsByCode(ab.xeroAuth, access_obj)
+            ]);
+        }).then(([contacts, bankTrans, accounts]) => {
+            bankTrans = bankTrans.filter(t => t.Type == 'RECEIVE'); // filter out spends
+            bankTrans = bankTrans.filter(t => (new Date(t.DateString)).getTime() < Date.UTC(2017,0,1)); // filter to just 2016
+            contacts.forEach(contact => {
+                const result = makeStatement(contact, bankTrans, accounts);
+                if (result) {
+                    ab.postMessage(msg.channel, snippetEscape(result));
+                }
+            })
         }).catch(err => {
             ab.postMessage(msg.channel, "Sorry, an error occurred: " + String(err) + '\n' + JSON.stringify(err));
         });
