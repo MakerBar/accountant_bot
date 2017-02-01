@@ -21,7 +21,7 @@ function makeStatement(contact, bank_trans, accounts) {
         tran.LineItems.forEach(function(li) {
             let description = li.Tracking.map(t => {
                 return t.Name + ": " + t.Option;
-            }).join('\n');
+            }).join(' - ');
             if (li.Description) {
                 if (description.length > 0) {
                     description + ' - ';
@@ -30,9 +30,11 @@ function makeStatement(contact, bank_trans, accounts) {
             }
             result += tran.DateString.split('T')[0] + ' - ' +
                 '$' + parseFloat(li.LineAmount).toFixed(2) + ' - ' +
-                accounts[li.AccountCode].Name + ' - ' +
-                description +
-                '\n';
+                accounts[li.AccountCode].Name;
+            if (descrption) {
+                result += ' - ' + description
+            }
+            result += '\n';
         });
     });
 
