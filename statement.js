@@ -31,7 +31,7 @@ function makeStatement(contact, bank_trans, accounts) {
             result += tran.DateString.split('T')[0] + ' - ' +
                 '$' + parseFloat(li.LineAmount).toFixed(2) + ' - ' +
                 accounts[li.AccountCode].Name;
-            if (descrption) {
+            if (description) {
                 result += ' - ' + description
             }
             result += '\n';
