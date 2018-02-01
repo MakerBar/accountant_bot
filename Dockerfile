@@ -5,5 +5,5 @@ EXPOSE 5000
 RUN mkdir /src
 VOLUME ["/src"]
 
-ENTRYPOINT ["node"]
+WORKDIR /src
 CMD ["/src/index.js"]
