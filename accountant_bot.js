@@ -152,7 +152,9 @@ AccountantBot.prototype.handleMessage = function(msg) {
             ]);
         }).then(([contacts, bankTrans, accounts]) => {
             bankTrans = bankTrans.filter(t => t.Type == 'RECEIVE'); // filter out spends
-            bankTrans = bankTrans.filter(t => (new Date(t.DateString)).getTime() < Date.UTC(2017,0,1)); // filter to just 2016
+            // filter to just 2017
+            bankTrans = bankTrans.filter(t => (new Date(t.DateString)).getTime() >= Date.UTC(2017,0,1));
+            bankTrans = bankTrans.filter(t => (new Date(t.DateString)).getTime() < Date.UTC(2018,0,1));
             contacts.forEach(contact => {
                 const result = makeStatement(contact, bankTrans, accounts);
                 if (result) {
